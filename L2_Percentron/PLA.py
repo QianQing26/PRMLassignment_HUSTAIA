@@ -15,7 +15,7 @@ class PLA:
         - max_iter: int, 最大迭代次数
         """
         self.w = np.ones(X.shape[1])  # 初始化权重为全1
-        self.b = 0  # 初始化偏置为0
+        self.b = 0.0  # 初始化偏置为0
         self.eta = eta
         self.max_iter = max_iter
         self.X = X
@@ -65,14 +65,27 @@ class PLA:
 
         """
         # 画出标签为1的点和标签为-1的点
-        plt.scatter(self.X[self.y == 1, 0], self.X[self.y == 1, 1], c="r", marker="o")
-        plt.scatter(self.X[self.y == -1, 0], self.X[self.y == -1, 1], c="b", marker="x")
+        plt.scatter(
+            self.X[self.y == 1, 0],
+            self.X[self.y == 1, 1],
+            c="r",
+            marker="o",
+            label="+1",
+        )
+        plt.scatter(
+            self.X[self.y == -1, 0],
+            self.X[self.y == -1, 1],
+            c="b",
+            marker="x",
+            label="-1",
+        )
         # 画出分割超平面
         x1_min, x1_max = self.X[:, 0].min(), self.X[:, 0].max()
         scale = (x1_max - x1_min) / 10
         x1 = np.arange(x1_min - scale, x1_max + scale, scale)
         x2 = (-self.w[0] * x1 - self.b) / self.w[1]
         plt.plot(x1, x2, c="g")
+        plt.legend()
         plt.show()
 
 
