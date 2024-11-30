@@ -46,13 +46,11 @@ class PLA:
             # 对当前权重w和偏置b，对训练数据进行预测
             y_pred = self.predict(self.X)
             # 遍历训练集，对错误的样本更新
-            idx = -1
-            for i in range(self.X.shape[0]):
-                if y_pred[i] != self.y[i]:
-                    idx = i
-                    break
-            if idx == -1:
-                # 所有样本都正确，停止训练
+            if any(y_pred != self.y):
+                err_idx = np.where(y_pred != self.y)[0]
+                idx = np.random.choice(err_idx)
+                # idx = np.where(y_pred != self.y)[0][0]
+            else:
                 break
             # 更新权重w和偏置b
             self.w += self.eta + self.X[idx] * self.y[idx]

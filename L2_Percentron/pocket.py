@@ -52,21 +52,20 @@ class Pocket:
         y_pred = self.predict(self.X)
         least_fault = np.sum(y_pred != self.y)
         for _ in range(self.max_iter):
-            idx = -1
             y_pred = self.model_predict(self.X, w, b)
-            fault_count = 0
-            for i in range(self.X.shape[0]):
-                if y_pred[i] != self.y[i]:
-                    idx = i
-                    fault_count += 1
-            if idx == -1:
+            if not np.any(y_pred != self.y):
+                # 没有找到错误分类的样本，结束训练
                 self.w = w
                 self.b = b
                 break
-            if fault_count < least_fault:
-                least_fault = fault_count
+            if np.sum(y_pred != self.y) < least_fault:
+                # 找到了更少错误分类的样本，更新权重w和偏置b
+                least_fault = np.sum(y_pred != self.y)
                 self.w = w
                 self.b = b
+            # 选择第一个分类错误的样本
+            err_idx = np.where(y_pred != self.y)[0]
+            idx = np.random.choice(err_idx)
             w += self.eta + self.y[idx] * self.X[idx]
             b += self.eta * self.y[idx]
         return self.w, self.b
