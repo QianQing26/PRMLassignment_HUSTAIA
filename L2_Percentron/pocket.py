@@ -3,10 +3,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-class PLA:
+class Pocket:
     def __init__(self, X: np.ndarray, y: np.ndarray, eta=1, max_iter=1500):
         """
-        初始化PLA模型.
+        初始化Pocket模型.
 
         Parameters:
         - X: (n_samples, n_features) array, 输入数据
@@ -14,15 +14,15 @@ class PLA:
         - eta: float, 学习率
         - max_iter: int, 最大迭代次数
         """
-        self.w = np.ones(X.shape[1])  # 初始化权重为全1
-        self.b = 0  # 初始化偏置为0
+        self.w = np.ones(X.shape[1])
+        self.b = 0
         self.eta = eta
         self.max_iter = max_iter
         self.X = X
         self.y = y
         self.fit()
 
-    def predict(self, X: np.ndarray):
+    def preditct(self, X: np.ndarray) -> np.ndarray:
         """
         对输入的数据X预测类别
 
@@ -30,33 +30,43 @@ class PLA:
         - X: (n_samples, n_features) array, 输入数据
 
         Returns:
-        - (n_samples,) array, 预测标签  +1 or -1
+        - (n_samples,) array, 预测标签   +1 or -1
         """
         return np.sign(X.dot(self.w) + self.b)
 
+    def model_predict(self, X: np.ndarray, w: np.ndarray, b: float) -> np.ndarray:
+
+        return np.sign(X.dot(w) + b)
+
     def fit(self):
         """
-        PLA模型训练，更新权重w和偏置b，在构造函数中调用
+        Pocket模型训练，更新权重w和偏置b，在构造函数中调用
 
         Returns:
         - (n_features,) array, 学习到的权重
-        - float, learned bias
+        - float, 学习到的偏置
         """
+
+        w = self.w
+        b = self.b
+        y_pred = self.preditct(self.X)
+        least_fault = np.sum(y_pred != self.y)
         for _ in range(self.max_iter):
-            # 对当前权重w和偏置b，对训练数据进行预测
-            y_pred = self.predict(self.X)
-            # 遍历训练集，对错误的样本更新
             idx = -1
+            y_pred = self.model_predict(self.X, w, b)
+            fault_count = 0
             for i in range(self.X.shape[0]):
                 if y_pred[i] != self.y[i]:
                     idx = i
-                    break
+                    fault_count += 1
             if idx == -1:
-                # 所有样本都正确，停止训练
                 break
-            # 更新权重w和偏置b
-            self.w += self.eta + self.X[idx] * self.y[idx]
-            self.b += self.eta * self.y[idx]
+            if fault_count < least_fault:
+                least_fault = fault_count
+                self.w = w
+                self.b = b
+            w += self.eta + self.y[idx] * self.X[idx]
+            b += self.eta * self.y[idx]
         return self.w, self.b
 
     def plot(self):
@@ -76,7 +86,6 @@ class PLA:
         plt.show()
 
 
-"""
 # Example:
 if __name__ == "__main__":
     # generate data
@@ -88,7 +97,6 @@ if __name__ == "__main__":
     X = np.vstack((X1, X2))
     y = np.hstack((Y1, Y2))
     # train PLA
-    pla = PLA(X, y, eta=1, max_iter=1000)
+    pla = Pocket(X, y, eta=1, max_iter=1000)
     # plot
     pla.plot()
-"""
