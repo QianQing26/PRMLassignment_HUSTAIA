@@ -21,7 +21,7 @@ class GeneralizedInverse:
     def classify(self, X):
         return np.sign(self.predict(X))
 
-    def plot_2classes(self, X, y):
+    def plot_2classes(self, X, y, show=False):
         plt.scatter(
             X[y == 1, 0],
             X[y == 1, 1],
@@ -48,7 +48,8 @@ class GeneralizedInverse:
         )
         plt.legend()
         plt.title("Generalized Inverse Method   loss=" + str(round(self.loss, 5)))
-        plt.show()
+        if show:
+            plt.show()
 
 
 class LinearRegression:
@@ -66,7 +67,7 @@ class LinearRegression:
     def classify(self, X):
         return np.sign(self.predict(X))
 
-    def train(self, lr=0.01, num_epochs=50):
+    def train(self, lr=0.01, num_epochs=30, plot_loss=False):
         loss_history = []
         for epoch in range(num_epochs):
             y_pred = self.predict(self.X)
@@ -77,13 +78,14 @@ class LinearRegression:
             self.w -= lr * gradw
             self.b -= lr * gradb
         self.loss = loss
-        plt.plot(loss_history)
-        plt.xlabel("Epoch")
-        plt.ylabel("Loss")
-        plt.title("Linear Regression   loss=" + str(round(loss, 5)))
-        plt.show()
+        if plot_loss:
+            plt.plot(loss_history)
+            plt.xlabel("Epoch")
+            plt.ylabel("Loss")
+            plt.title("Linear Regression   loss=" + str(round(loss, 5)))
+            plt.show()
 
-    def plot_2classes(self, X, y):
+    def plot_2classes(self, X, y, show=False):
         plt.scatter(
             X[y == 1, 0],
             X[y == 1, 1],
@@ -110,9 +112,11 @@ class LinearRegression:
         )
         plt.legend()
         plt.title("Linear Regression   loss=" + str(round(self.loss, 5)))
-        plt.show()
+        if show:
+            plt.show()
 
 
+"""
 if __name__ == "__main__":
     np.random.seed(0)
     X1 = np.random.multivariate_normal([-5, 0], np.eye(2), size=200)
@@ -129,5 +133,5 @@ if __name__ == "__main__":
 
     model2 = LinearRegression(X, y)
     model2.train()
-    # print(model2.loss)
     model2.plot_2classes(X, y)
+"""
