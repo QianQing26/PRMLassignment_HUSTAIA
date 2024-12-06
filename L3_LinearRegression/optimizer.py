@@ -3,20 +3,43 @@ import numpy as np
 
 class GradientDescent:
     def __init__(self, learning_rate=0.01):
+        """_summary_
+
+        Args:
+            learning_rate (float, optional): Learning rate. Defaults to 0.01.
+        """
         self.learning_rate = learning_rate
 
     def update(self, params, grads):
+        """_summary_
+
+        Args:
+            params (_type_): parameters to be updated
+            grads (_type_): gradients of parameters to be updated
+        """
         for key in params.keys():
             params[key] -= self.learning_rate * grads[key]
 
 
 class Momentum:
     def __init__(self, learning_rate=0.01, momentum=0.9):
+        """_summary_
+
+        Args:
+            learning_rate (float, optional): _description_. Defaults to 0.01.
+            momentum (float, optional): _description_. Defaults to 0.9.
+        """
         self.learning_rate = learning_rate
         self.momentum = momentum
         self.velocity = None
 
     def update(self, params, grads):
+        """_summary_
+
+        Args:
+            params (_type_): _description_
+            grads (_type_): _description_
+        """
         if self.velocity is None:
             self.velocity = {}
             for key, val in params.items():
