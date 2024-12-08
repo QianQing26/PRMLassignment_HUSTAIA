@@ -4,6 +4,9 @@ import cvxopt as cvx
 import cvxopt.solvers as cvx_solver
 import seaborn as sns
 from sklearn.preprocessing import PolynomialFeatures
+import kernel
+from sklearn.svm import SVC
+from sklearn.preprocessing import StandardScaler
 
 
 class PrimalSVM:
@@ -135,22 +138,137 @@ class DualSVM:
 
 
 class KernelSVM:
-    def __init___(self, kernel, degree=2):
-        self.alpha = None
-        self.SupportVector = None
-        self.w = None
-        self.b = None
-        if kernel == "Poly":
-            self.kernel = PolynomialFeatures(degree=degree, include_bias=False)
 
-    def Phi(self, x):
-        pass
+    def __init__(
+        self, kernel="rbf", C=1.0, degree=3, gamma="scale", coef0=0, random_state=42
+    ):
+        """
+        初始化 SVM 模型
+        kernel: 核函数类型，支持 'linear', 'poly', 'rbf', 'sigmoid'
+        C: 正则化参数
+        degree: 多项式核的阶数，仅在 kernel='poly' 时有效
+        gamma: 核函数的超参数，仅在 rbf 和 poly 核时有效
+        coef0: 核函数的常数项，仅在 poly 和 sigmoid 核时有效
+        """
+        self.kernel = kernel
+        self.C = C
+        self.degree = degree
+        self.gamma = gamma
+        self.coef0 = coef0
+        self.random_state = random_state
 
-    def K(self, X1, X2):
-        pass
+        # 初始化 SVC 模型
+        self.model = SVC(
+            kernel=self.kernel,
+            C=self.C,
+            degree=self.degree,
+            gamma=self.gamma,
+            coef0=self.coef0,
+            random_state=self.random_state,
+        )
 
     def fit(self, X, y):
-        pass
+        """
+        训练 SVM 模型
+        X: 特征矩阵
+        y: 标签
+        """
+        # 标准化数据
+        scaler = StandardScaler()
+        X_scaled = scaler.fit_transform(X)
+
+        # 训练模型
+        self.model.fit(X_scaled, y)
+
+    def predict(self, X):
+        """
+        预测新数据
+        X: 新样本特征矩阵
+        """
+        # 标准化数据
+        scaler = StandardScaler()
+        X_scaled = scaler.fit_transform(X)
+
+        return self.model.predict(X_scaled)
+
+    def visualize(self, X, y, show=False):
+        """
+        绘制分类面间隔面
+        """
+        sns.set(style="whitegrid", palette="muted")
+
+        # 标准化数据
+        scaler = StandardScaler()
+        X_scaled = scaler.fit_transform(X)
+
+        x_min, x_max = X_scaled[:, 0].min() - 1, X_scaled[:, 0].max() + 1
+        y_min, y_max = X_scaled[:, 1].min() - 1, X_scaled[:, 1].max() + 1
+        xx, yy = np.meshgrid(
+            np.arange(x_min, x_max, 0.01), np.arange(y_min, y_max, 0.01)
+        )
+        Z = self.model.predict(np.c_[xx.ravel(), yy.ravel()])
+        Z = Z.reshape(xx.shape)
+        plt.contourf(xx, yy, Z, alpha=0.75, cmap="coolwarm")
+        plt.scatter(
+            X_scaled[y == 1, 0],
+            X_scaled[y == 1, 1],
+            edgecolors="k",
+            marker="o",
+            cmap=plt.cm.RdYlBu,
+            s=80,
+        )
+        plt.scatter(
+            X_scaled[y == 0, 0],
+            X_scaled[y == 0, 1],
+            edgecolors="k",
+            marker="o",
+            cmap=plt.cm.RdYlBu,
+            s=80,
+        )
+        plt.xlabel("Feature 1", fontsize=12)
+        plt.ylabel("Feature 2", fontsize=12)
+        plt.title("Classification Boundary", fontsize=14)
+
+        if show:
+            plt.show()
+
+
+# class KernelSVM:
+#     def __init__(self, kernel=kernel.PolynomialKernel(degree=2)):
+#         self.alpha = None
+#         self.SupportVector = None
+#         self.kernel = kernel
+#         self.w = None
+#         self.b = None
+
+#     def fit(self, X, y):
+#         self.X = X
+#         self.y = y
+#         n_samples, n_features = X.shape
+#         y = y.reshape(-1, 1)
+#         Q = cvx.matrix((self.kernel(y * X, y * X)).astype(np.double))
+#         # print(Q)
+#         p = cvx.matrix(-1 * np.ones((n_samples, 1)).astype(np.double))
+#         G = cvx.matrix(-1 * np.eye(n_samples).astype(np.double))
+#         h = cvx.matrix(np.zeros((n_samples, 1)).astype(np.double))
+#         A = cvx.matrix((y.T).astype(np.double))
+#         b = cvx.matrix(0.0)
+#         solution = cvx_solver.qp(Q, p, G, h, A, b)
+#         self.alpha = np.array(solution["x"]).reshape(1, -1)[0]
+#         self.SupportVector = X[self.alpha > 1e-4]
+#         supportY = y[self.alpha > 1e-4]
+#         supportAlpha = self.alpha[self.alpha > 1e-4]
+
+#         self.w = (supportY.reshape(1, -1)[0] * supportAlpha.reshape(1, -1)[0]).reshape(
+#             -1, 1
+#         )
+
+#         self.b = supportY[0] - np.sum(
+#             self.w * self.kernel(self.SupportVector[0], self.SupportVector), axis=0
+#         )
+
+#     def predict(self, X):
+#         return np.sign(self.kernel(X, self.w.reshape(1, -1)) + self.b)
 
 
 if __name__ == "__main__":
@@ -158,4 +276,4 @@ if __name__ == "__main__":
     y = np.array([1, 1, 1, -1, -1, -1])
     svm = DualSVM()
     svm.fit(X, y)
-    svm.visualize(X, y, show=True)
+    # svm.visualize(X, y, show=True)
