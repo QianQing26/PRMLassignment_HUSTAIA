@@ -272,8 +272,12 @@ class KernelSVM:
 
 
 if __name__ == "__main__":
-    X = np.array([[1, 1], [2, 2], [2, 0], [0, 0], [1, 0], [0, 1]])
-    y = np.array([1, 1, 1, -1, -1, -1])
+    X = np.array([[2, 2], [-2, -2], [2, -2], [-2, 2]])
+    y = np.array([1, 1, -1, -1])
     svm = DualSVM()
     svm.fit(X, y)
+    print(svm.w)
+    print(svm.b)
+    print(svm.alpha)
+    print(svm.SupportVector)
     # svm.visualize(X, y, show=True)
