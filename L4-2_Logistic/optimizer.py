@@ -57,7 +57,7 @@ class Momentum:
 class AdaGrad:
     def __init__(self, learning_rate=0.01, epsilon=1e-7):
         self.learning_rate = learning_rate
-        self.espsilon = epsilon
+        self.epsilon = epsilon
         self.h = None
 
     def update(self, params, grads):
@@ -69,7 +69,7 @@ class AdaGrad:
         for key in params.keys():
             self.h[key] += grads[key] ** 2
             params[key] -= (
-                self.learning_rate * grads[key] / (self.h[key] + self.espsilon) ** 0.5
+                self.learning_rate * grads[key] / (self.h[key] + self.epsilon) ** 0.5
             )
 
 

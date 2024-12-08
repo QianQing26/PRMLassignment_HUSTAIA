@@ -1,6 +1,7 @@
 import numpy as np
 from sklearn.preprocessing import OneHotEncoder
 import optimizer
+from sklearn.metrics import accuracy_score
 
 
 # class SoftmaxClassifier:
@@ -84,6 +85,10 @@ class SoftmaxClassifier:
         probs = self.softmax(s)
         return np.argmax(probs, axis=1)
 
+    def score(self, X, y):
+        y_pred = self.predict(X)
+        return accuracy_score(y, y_pred)
+
     def softmax(self, X):
         exp_X = np.exp(X - np.max(X, axis=1, keepdims=True))  # 数值稳定性优化
         return exp_X / np.sum(exp_X, axis=1, keepdims=True)
@@ -99,6 +104,7 @@ class SoftmaxClassifier:
 
     def fit(self, X, y, optimizer, batch_size=4, num_epochs=100, verbose=True):
         loss_history = []
+        acc_history = []
         self.n_samples, self.n_features = X.shape
         self.n_classes = len(np.unique(y))
         self.w = np.random.randn(self.n_features, self.n_classes) * 0.01  # 随机初始化
@@ -128,8 +134,11 @@ class SoftmaxClassifier:
                 # print(params)
                 self.w = params["w"]
                 self.b = params["b"]
-
+            # calculate accuracy
+            y_pred = self.predict(X)
+            acc = accuracy_score(y, y_pred)
+            acc_history.append(acc)
             if verbose:
                 print(f"Epoch {epoch + 1}/{num_epochs}, Loss: {loss:.4f}")
 
-        return loss_history
+        return loss_history, acc_history
