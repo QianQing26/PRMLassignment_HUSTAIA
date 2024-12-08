@@ -63,7 +63,7 @@ class logistic:
             )
             plt.xlabel("Epochs")
             plt.ylabel("Loss")
-            plt.title("Trainning Loss Over Epochs")
+            plt.title("Training Loss Over Epochs")
             plt.grid(alpha=0.3)
             plt.legend(fontsize=12, loc="best")
             plt.show()
