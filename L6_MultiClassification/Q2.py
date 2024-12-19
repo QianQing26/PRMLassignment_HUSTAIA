@@ -31,7 +31,7 @@ model = SoftmaxClassifier()
 # optimizer = optimizer.Adam(learning_rate=0.005)
 optimizer = optimizer.GradientDescent(learning_rate=0.1)
 losses, accuracies = model.fit(
-    X_train, y_train, optimizer=optimizer, num_epochs=20, batch_size=256
+    X_train, y_train, optimizer=optimizer, num_epochs=10, batch_size=256
 )
 y_pred = model.predict(X_test)
 accuracy = accuracy_score(y_test, y_pred)
@@ -43,4 +43,20 @@ plt.title("Accuracy")
 plt.subplot(1, 2, 2)
 plt.plot(losses)
 plt.title("Loss")
+plt.show()
+
+# 在测试集上抽取10个样本，并可视化
+sample_indices = np.random.choice(X_test.shape[0], 10)
+sample_images = X_test[sample_indices]
+sample_labels = y_test[sample_indices]
+sample_predictions = model.predict(sample_images)
+
+fig, axes = plt.subplots(2, 5, figsize=(10, 5))
+for i, (ax, img, label, pred) in enumerate(
+    zip(axes.flatten(), sample_images, sample_labels, sample_predictions)
+):
+    ax.imshow(img.reshape((28, 28)), cmap="gray")
+    ax.set_title(f"Label: {label}, Prediction: {pred}")
+    ax.axis("off")
+plt.tight_layout()
 plt.show()

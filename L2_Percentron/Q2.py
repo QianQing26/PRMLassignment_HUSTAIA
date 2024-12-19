@@ -23,14 +23,14 @@ X_train, X_test, Y_train, Y_test = train_test_split(
 
 # T在训练集上训练PLA和Pocket算法
 max_iter = 1000
-eta = 0.5
-pla_start_time = time.time()
+eta = 1
+pla_start_time = time.perf_counter()
 pla = PLA(X_train, Y_train, eta=eta, max_iter=max_iter)
-pla_end_time = time.time()
+pla_end_time = time.perf_counter()
 pla_time = pla_end_time - pla_start_time
-pocket_start_time = time.time()
+pocket_start_time = time.perf_counter()
 pocket = Pocket(X_train, Y_train, eta=eta, max_iter=max_iter)
-pocket_end_time = time.time()
+pocket_end_time = time.perf_counter()
 pocket_time = pocket_end_time - pocket_start_time
 
 
@@ -85,8 +85,8 @@ plt.legend()
 plt.show()
 
 # 打印PLA和Pocket算法的训练时间
-print("PLA time:", round(pla_time * 1000, 5))
-print("Pocket time:", round(pocket_time * 1000, 5))
+print(f"PLA time: {pla_time*1000} ms")
+print(f"Pocket time: {pocket_time*1000} ms")
 
 # 计算PLA和Pocket算法在训练集上的准确率
 Y_pred_pla = pla.predict(X_train)
