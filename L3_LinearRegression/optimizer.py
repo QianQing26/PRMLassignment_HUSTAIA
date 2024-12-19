@@ -117,3 +117,40 @@ class Adam:
             m_hat = self.m[key] / (1 - self.beta1**self.t)
             v_hat = self.v[key] / (1 - self.beta2**self.t)
             params[key] -= self.learning_rate * m_hat / (v_hat + self.epsilon) ** 0.5
+
+
+class Nesterov:
+    def __init__(self, learning_rate=0.01, momentum=0.9):
+        """Nesterov Accelerated Gradient optimizer.
+
+        Args:
+            learning_rate (float, optional): Learning rate. Defaults to 0.01.
+            momentum (float, optional): Momentum coefficient. Defaults to 0.9.
+        """
+        self.learning_rate = learning_rate
+        self.momentum = momentum
+        self.velocity = None
+
+    def update(self, params, grads):
+        """Update parameters using Nesterov Accelerated Gradient.
+
+        Args:
+            params (dict): Dictionary of parameters to be updated.
+            grads (dict): Dictionary of gradients of parameters.
+        """
+        if self.velocity is None:
+            self.velocity = {}
+            for key, val in params.items():
+                self.velocity[key] = (
+                    np.zeros_like(val) if isinstance(val, np.ndarray) else 0.0
+                )
+
+        for key in params.keys():
+            prev_velocity = self.velocity[key]
+            self.velocity[key] = (
+                self.momentum * self.velocity[key] - self.learning_rate * grads[key]
+            )
+            params[key] += (
+                -self.momentum * prev_velocity
+                + (1 + self.momentum) * self.velocity[key]
+            )

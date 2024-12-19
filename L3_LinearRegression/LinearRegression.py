@@ -67,16 +67,25 @@ class LinearRegression:
     def classify(self, X):
         return np.sign(self.predict(X))
 
-    def train(self, lr=0.01, num_epochs=30, plot_loss=False):
+    def train(self, lr=0.01, num_epochs=30, batch_size=8, plot_loss=False):
         loss_history = []
-        for epoch in range(num_epochs):
+        for _ in range(num_epochs):
+            mask = np.arange(self.N)
+            np.random.shuffle(mask)
+            for i in range(0, self.N, batch_size):
+                batch_mask = mask[i : i + batch_size]
+                X_batch = self.X[batch_mask]
+                y_batch = self.y[batch_mask]
+                y_pred = self.predict(X_batch)
+                loss = MSEfunction(y_batch, y_pred)
+                gradw = 2 / batch_size * X_batch.T.dot(y_pred - y_batch)
+                gradb = 2 / batch_size * (y_pred - y_batch).sum()
+                self.w -= lr * gradw
+                self.b -= lr * gradb
+            # 计算当前损失函数
             y_pred = self.predict(self.X)
             loss = MSEfunction(self.y, y_pred)
             loss_history.append(loss)
-            gradw = 2 / self.N * self.X.T.dot(y_pred - self.y)
-            gradb = 2 / self.N * (y_pred - self.y).sum()
-            self.w -= lr * gradw
-            self.b -= lr * gradb
         self.loss = loss
         if plot_loss:
             plt.plot(loss_history)

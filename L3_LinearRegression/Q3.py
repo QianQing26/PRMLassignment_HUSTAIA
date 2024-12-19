@@ -6,11 +6,17 @@ from sklearn.metrics import accuracy_score
 from LinearRegression import LinearRegression, GeneralizedInverse
 
 # Generate data
-np.random.seed(42)
-X1 = np.random.multivariate_normal([-1, 0], np.eye(2), size=200)
+np.random.seed(2024)
+X1 = np.random.multivariate_normal([-5, 0], np.eye(2), size=200)
 Y1 = np.ones(X1.shape[0])
-X2 = np.random.multivariate_normal([0, 1], np.eye(2), size=200)
+X2 = np.random.multivariate_normal([0, 5], np.eye(2), size=200)
 Y2 = -np.ones(X2.shape[0])
+# X3 = np.random.multivariate_normal([-5, 0], np.eye(2), size=10)
+# Y3 = -np.ones(X3.shape[0])
+# X4 = np.random.multivariate_normal([0, 5], np.eye(2), size=10)
+# Y4 = np.ones(X4.shape[0])
+# X = np.vstack((X1, X2, X3, X4))
+# Y = np.hstack((Y1, Y2, Y3, Y4))
 X = np.vstack((X1, X2))
 Y = np.hstack((Y1, Y2))
 
@@ -21,7 +27,7 @@ X_train, X_test, Y_train, Y_test = train_test_split(
 
 model1 = GeneralizedInverse(X=X_train, y=Y_train)
 model2 = LinearRegression(X=X_train, y=Y_train)
-model2.train(lr=0.01, num_epochs=200, plot_loss=True)
+model2.train(lr=0.01, num_epochs=20, batch_size=64, plot_loss=True)
 
 # 广义逆
 y_pred11 = model1.classify(X_train)

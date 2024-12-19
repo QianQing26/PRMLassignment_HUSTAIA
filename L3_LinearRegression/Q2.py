@@ -6,7 +6,7 @@ from sklearn.metrics import accuracy_score
 from LinearRegression import LinearRegression, GeneralizedInverse
 
 # Generate data
-np.random.seed(42)
+np.random.seed(2024)
 X1 = np.random.multivariate_normal([-5, 0], np.eye(2), size=200)
 Y1 = np.ones(X1.shape[0])
 X2 = np.random.multivariate_normal([0, 5], np.eye(2), size=200)
@@ -21,7 +21,7 @@ X_train, X_test, Y_train, Y_test = train_test_split(
 
 model1 = GeneralizedInverse(X=X_train, y=Y_train)
 model2 = LinearRegression(X=X_train, y=Y_train)
-model2.train(lr=0.0025, num_epochs=60, plot_loss=True)
+model2.train(lr=0.01, num_epochs=20, batch_size=64, plot_loss=True)
 
 # 广义逆
 y_pred11 = model1.classify(X_train)
