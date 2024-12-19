@@ -24,6 +24,9 @@ optimizer = opti.Adam()
 # train the model on the training set
 model.train(optimizer=optimizer, batch_size=16, num_epoch=20, plot=True)
 
+# print the learned parameters
+print(f"模型参数为 w= {model.w} ;b= {model.b}")
+
 # evaluate the model on the testing set
 Y_pred = model.predict(X_test)
 accuracy = accuracy_score(Y_test, Y_pred)

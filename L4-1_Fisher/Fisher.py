@@ -86,7 +86,7 @@ class Fisher:
             linewidth=2,
             color="black",
         )
-        plt.legend()
+        plt.legend(loc="best")
         plt.xlabel("Projection Value", fontsize=12)
         plt.ylabel("Frequency", fontsize=12)
         plt.title("Projections of data points after projection", fontsize=14)
