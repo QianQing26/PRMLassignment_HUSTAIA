@@ -10,12 +10,13 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 # 设置超参数
-learning_rate = 0.0091
-epochs = 2
+learning_rate = 0.01
+epochs = 10
 batch_size = 256
-train_flag = True
+train_flag = False
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(f"使用设备：{device}")
 transform = transforms.Compose(
     [
         transforms.ToTensor(),
@@ -151,6 +152,91 @@ def plot_misclassified_images(images, true_labels, predicted_labels, num_samples
     plt.show()
 
 
+def visualize_samples(model, test_loader, device, num_samples=10):
+    model.eval()
+    correct_images = []
+    correct_labels = []
+    misclassified_images = []
+    misclassified_true_labels = []
+    misclassified_predicted_labels = []
+
+    with torch.no_grad():
+        for images, labels in test_loader:
+            images, labels = images.to(device), labels.to(device)
+            outputs = model(images)
+            _, predicted = torch.max(outputs, 1)
+
+            for idx in range(len(images)):
+                if predicted[idx] == labels[idx]:
+                    if len(correct_images) < num_samples:
+                        correct_images.append(images[idx].cpu().numpy())
+                        correct_labels.append(labels[idx].item())
+                else:
+                    if len(misclassified_images) < num_samples:
+                        misclassified_images.append(images[idx].cpu().numpy())
+                        misclassified_true_labels.append(labels[idx].item())
+                        misclassified_predicted_labels.append(predicted[idx].item())
+
+                if (
+                    len(correct_images) >= num_samples
+                    and len(misclassified_images) >= num_samples
+                ):
+                    break
+
+            if (
+                len(correct_images) >= num_samples
+                and len(misclassified_images) >= num_samples
+            ):
+                break
+
+    # 可视化这些样本
+    plot_correct_samples(correct_images, correct_labels, num_samples)
+    plot_misclassified_samples(
+        misclassified_images,
+        misclassified_true_labels,
+        misclassified_predicted_labels,
+        num_samples,
+    )
+
+
+def plot_correct_samples(correct_images, correct_labels, num_samples):
+    plt.figure(figsize=(15, 8))
+
+    # 绘制正确预测的样本
+    for i in range(num_samples):
+        plt.subplot(2, 5, i + 1)
+        image = correct_images[i].squeeze()
+        plt.imshow(image, cmap="gray")
+        plt.title(f"Correct: {correct_labels[i]}", fontsize=12)
+        plt.axis("off")
+    plt.suptitle("Correctly Predicted", fontsize=15)
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_misclassified_samples(
+    misclassified_images,
+    misclassified_true_labels,
+    misclassified_predicted_labels,
+    num_samples,
+):
+    plt.figure(figsize=(15, 8))
+
+    # 绘制错误预测的样本
+    for i in range(num_samples):
+        plt.subplot(2, 5, i + 1)
+        image = misclassified_images[i].squeeze()
+        plt.imshow(image, cmap="gray")
+        plt.title(
+            f"True: {misclassified_true_labels[i]}    Pred: {misclassified_predicted_labels[i]}",
+            fontsize=12,
+        )
+        plt.axis("off")
+    plt.suptitle("Misclassified", fontsize=15)
+    plt.tight_layout()
+    plt.show()
+
+
 if train_flag:
     train(model, train_loader, optimizer, criterion, device, epochs)
     print("训练完成")
@@ -187,4 +273,6 @@ plt.xlabel("Predicted")
 plt.ylabel("True")
 plt.show()
 # 可视化识别错误的样本
-visualize_misclassified_samples(model, test_loader, device)
+# visualize_misclassified_samples(model, test_loader, device)
+
+visualize_samples(model, test_loader, device, num_samples=10)

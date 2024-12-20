@@ -8,6 +8,8 @@ from neuralnetwork import NeuralNetwork
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
+np.random.seed(12)
+
 # 加载IRIS数据集
 iris = load_iris()
 X, y = iris.data, iris.target
@@ -23,10 +25,10 @@ y_test = torch.from_numpy(y_test.astype(np.int64))
 
 # 设置超参数
 input_size = X.shape[1]
-hidden_size = [10, 10]
+hidden_size = [3, 5, 3]
 output_size = len(np.unique(y))
 learning_rate = 0.01
-epochs = 30
+epochs = 50
 batch_size = 32
 
 # 定义模型
@@ -38,6 +40,7 @@ optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
 # 训练模型
 losses = []
+acc = []
 for epoch in range(epochs):
     model.train()
     permutation = torch.randperm(X_train.size(0))
@@ -48,11 +51,21 @@ for epoch in range(epochs):
         optimizer.zero_grad()
         outputs = model(batch_X)
         loss = criterion(outputs, batch_Y)
-        losses.append(loss.item())
         loss.backward()
         optimizer.step()
-
-    print(f"Epoch {epoch+1}/{epochs}: loss = {loss.item():4f}")
+    # 统计正确率
+    model.eval()
+    with torch.no_grad():
+        outputs = model(X_train)
+        _, y_pred = torch.max(outputs.data, 1)
+        y_pred = y_pred.numpy()
+        label = y_train.numpy()
+        accuracy = accuracy_score(label, y_pred)
+    losses.append(loss.item())
+    acc.append(accuracy)
+    print(
+        f"Epoch {epoch+1}/{epochs}: loss = {loss.item():4f}   accuracy = {accuracy:.4f}"
+    )
 
 # 测试模型
 model.eval()
@@ -64,8 +77,18 @@ with torch.no_grad():
     accuracy = accuracy_score(label, y_pred)
     print(f"Test Accuracy: {accuracy:.4f}")
 
-# 绘制损失函数
+# 绘制损失函数和正确率
+plt.figure(figsize=(10, 5))
+plt.subplot(1, 2, 1)
 plt.plot(losses)
-plt.xlabel("Iteration")
+plt.xlabel("Epoch")
 plt.ylabel("Loss")
+plt.title("Training Loss")
+plt.grid()
+plt.subplot(1, 2, 2)
+plt.plot(acc)
+plt.xlabel("Epoch")
+plt.ylabel("Accuracy")
+plt.title("Training Accuracy")
+plt.grid()
 plt.show()

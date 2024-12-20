@@ -44,5 +44,4 @@ class LeNet(nn.Module):
         x = self.fc2(x)
         x = self.sigmoid4(x)
         x = self.fc3(x)
-        # x = self.softmax(x)
         return x
