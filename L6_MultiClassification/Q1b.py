@@ -6,6 +6,8 @@ from Softmax import SoftmaxClassifier
 import matplotlib.pyplot as plt
 import optimizer
 
+np.random.seed(26)
+
 # Load the iris dataset
 iris = datasets.load_iris()
 X = iris.data
@@ -20,7 +22,9 @@ X_train, X_test, y_train, y_test = train_test_split(
 clf = SoftmaxClassifier()
 
 # Train the classifier on the training set
-losses = clf.fit(X_train, y_train, optimizer=optimizer.Adam())
+losses, _ = clf.fit(
+    X_train, y_train, optimizer=optimizer.RMSprop(), batch_size=64, num_epochs=100
+)
 
 # Predict the labels of the test set
 y_pred = clf.predict(X_test)
@@ -29,4 +33,8 @@ y_pred = clf.predict(X_test)
 accuracy = accuracy_score(y_test, y_pred)
 print("Accuracy:", accuracy)
 plt.plot(losses)
+plt.xlabel("Epochs")
+plt.ylabel("Loss")
+plt.title("Training Loss")
+plt.grid()
 plt.show()

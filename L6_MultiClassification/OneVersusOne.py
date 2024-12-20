@@ -1,5 +1,7 @@
 import numpy as np
 from PLA import PLA
+import matplotlib.pyplot as plt
+from matplotlib.colors import ListedColormap
 
 
 class OVOwithPLA:
@@ -28,49 +30,8 @@ class OVOwithPLA:
         # 获取所有二分类器的预测结果
         for (class_1, class_2), classifier in self.classifiers.items():
             y_pred = classifier.predict(X)
-            votes[:, class_1] += y_pred == 1
-            votes[:, class_2] += y_pred == -1
+            votes[:, class_1] += (y_pred == 1).astype(int)
+            votes[:, class_2] += (y_pred == -1).astype(int)
 
         # 返回投票数最多的类别
         return self.classes[np.argmax(votes, axis=1)]
-
-    # def plot_decision_boundary(self, X, y, ax=None):
-    #     # 设置绘图风格
-    #     sns.set_style("whitegrid")
-    #     if ax is None:
-    #         ax = plt.gca()
-
-    #     # 设置特征边界
-    #     x_min, x_max = X[:, 0].min() - 0.1, X[:, 0].max() + 0.1
-    #     y_min, y_max = X[:, 1].min() - 0.1, X[:, 1].max() + 0.1
-
-    #     # 绘制数据点
-    #     for cls in self.classes:
-    #         sns.scatterplot(
-    #             x=X[y == cls, 0],
-    #             y=X[y == cls, 1],
-    #             label=f"Class {cls}",
-    #             ax=ax,
-    #             s=60,
-    #             alpha=0.9,
-    #             edgecolor="k",
-    #         )
-
-    #     # 绘制每个二分类器的决策边界
-    #     for (class_1, class_2), classifier in self.classifiers.items():
-    #         x_vals = np.linspace(x_min, x_max, 500)
-    #         y_vals = (-classifier.w[0] * x_vals - classifier.b) / classifier.w[1]
-    #         ax.plot(
-    #             x_vals,
-    #             y_vals,
-    #             label=f"{class_1} vs {class_2}",
-    #             linewidth=2,
-    #         )
-
-    #     # 设置图形标签
-    #     ax.set_xlabel("Feature 1", fontsize=12)
-    #     ax.set_ylabel("Feature 2", fontsize=12)
-    #     ax.set_title("Decision Boundary", fontsize=14)
-    #     ax.legend(fontsize=10, loc="best", frameon=True)
-    #     plt.tight_layout()
-    #     plt.show()

@@ -127,7 +127,6 @@ class SoftmaxClassifier:
                 probs = self.softmax(np.dot(X_batch, self.w) + self.b)
                 # Compute loss and gradients
                 loss = self.cross_entropy(probs, y_batch)
-                loss_history.append(loss)
                 grads = self.compute_gradient(X_batch, y_batch, probs)
                 # Update parameters
                 optimizer.update(params, grads)
@@ -138,6 +137,7 @@ class SoftmaxClassifier:
             y_pred = self.predict(X)
             acc = accuracy_score(y, y_pred)
             acc_history.append(acc)
+            loss_history.append(loss)
             if verbose:
                 print(f"Epoch {epoch + 1}/{num_epochs}, Loss: {loss:.4f}")
 
